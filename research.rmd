@@ -17,8 +17,6 @@ require(ggplot2)
 library(chron)
 library(ggplot2)
 
-Sys.setlocale("LC_TIME","English United States")
-Sys.setlocale("LC_TIME", "en_US")
 
 process <- function(date){
     dt_tm <- substring(date, 1, 19)
@@ -86,10 +84,10 @@ ggplot(data=data_s, aes(x=hours, y=messages)) +
 # Weekday plots
 
 messages <- c()
-days <- weekdays(x=as.Date(seq(7), origin="1950-01-01"))
+days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
 for (day in days){
-    messages <- c(messages, nrow(df[weekdays(df$date, abbreviate = FALSE) == day,]))
+    messages <- c(messages, nrow(df[weekdays(df$date) == day,]))
 }
 
 
@@ -99,13 +97,6 @@ data_days = data.frame(weekday = days,  messages = messages)
 ggplot(data=data_days, aes(x=days, y=messages)) +
        geom_bar(stat="identity", fill="#66a182") +
        geom_text(aes(label=messages), vjust=-0.3, size=3.5)+
+       scale_x_discrete(limits=days)+
        theme_minimal()
-
 ```
-
-
-
-
-
-
-
