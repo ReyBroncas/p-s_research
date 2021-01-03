@@ -9,10 +9,9 @@ output:
 
 
 
-
-
-
 ```{r}
+# Preprocessing
+
 require(chron)
 require(ggplot2)
 library(chron)
@@ -20,8 +19,7 @@ library(ggplot2)
 
 
 
-process <- function(date)
-{
+process <- function(date){
     dt_tm <- substring(date, 1, 19)
     dt_tm <- t(as.data.frame(strsplit(dt_tm,' ')))
     row.names(dt_tm) = NULL
@@ -30,19 +28,19 @@ process <- function(date)
 }
 
 
-
-df <- read.csv("general_df4.csv")
+df <- read.csv("data/general_df.csv")
 df$date <- process(df$date)
+df$weekday <- weekdays(df$date, abbreviate = FALSE)
+```
 
 
+```{r}
+# Hours plots
 
 messages <- c()
 hours <- c(0:23)
 
-
-
-for (hour in hours)
-{
+for (hour in hours){ 
     messages <- c(messages, nrow(df[hours(df$date) == hour,]))
 }
 
@@ -84,7 +82,26 @@ ggplot(data=data_s, aes(x=hours, y=messages)) +
 
 
 
+```{r}
+# Weekday plots
 
+messages <- c()
+days <- weekdays(x=as.Date(seq(7), origin="1950-01-01"))
+
+for (day in days){
+    messages <- c(messages, nrow(df[df$weekday == day,]))
+}
+
+
+
+data_days = data.frame(weekday = days,  messages = messages)
+
+ggplot(data=data_days, aes(x=days, y=messages)) +
+       geom_bar(stat="identity", fill="#66a182") +
+       geom_text(aes(label=messages), vjust=-0.3, size=3.5)+
+       theme_minimal()
+
+```
 
 
 
