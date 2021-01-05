@@ -14,11 +14,21 @@ output:
 
 require(chron)
 require(ggplot2)
+require(plyr)
+require(dplyr)
+require(fitdistrplus)
+require(logspline)
 library(chron)
 library(ggplot2)
+library(plyr)
+library(dplyr)
+library(fitdistrplus)
+#library(logspline)
 
 
-process <- function(date){
+
+process <- function(date)
+{
     dt_tm <- substring(date, 1, 19)
     dt_tm <- t(as.data.frame(strsplit(dt_tm,' ')))
     row.names(dt_tm) = NULL
@@ -27,7 +37,7 @@ process <- function(date){
 }
 
 
-df <- read.csv("data/general_df.csv")
+df <- read.csv("data/data.csv")
 df$date <- process(df$date)
 ```
 
@@ -43,12 +53,13 @@ for (hour in hours){
 }
 
 
-
 data_am = data.frame(hours = hours[1:12],  messages = messages[1:12])
 data_pm = data.frame(hours = hours[13:24], messages = messages[13:24])
 data_d = data.frame(tm = c(rep("am", 12), rep("pm", 12)), hours = c(hours[1:12], hours[1:12]),  messages = messages)
 data_s = data.frame(hours = hours,  messages = messages)
 
+
+best_hour <- data_s[which.max(data_s$messages),]$hours;
 
 
 ggplot(data=data_am, aes(x=hours, y=messages)) +
@@ -76,6 +87,11 @@ ggplot(data=data_s, aes(x=hours, y=messages)) +
        geom_bar(stat="identity", fill="#5f249f") +
        geom_text(aes(label=messages), vjust=-0.3, size=3.5)+
        theme_minimal()
+
+
+descdist(messages)
+plot(fitdist(messages, "unif"))
+
 ```
 
 
@@ -83,20 +99,99 @@ ggplot(data=data_s, aes(x=hours, y=messages)) +
 ```{r}
 # Weekday plots
 
+
+
 messages <- c()
 days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
 
-for (day in days){
+
+
+for (day in days)
+{
     messages <- c(messages, nrow(df[weekdays(df$date) == day,]))
 }
 
 
 
 data_days = data.frame(weekday = days,  messages = messages)
-
 ggplot(data=data_days, aes(x=days, y=messages)) +
        geom_bar(stat="identity", fill="#66a182") +
        geom_text(aes(label=messages), vjust=-0.3, size=3.5)+
        scale_x_discrete(limits=days)+
        theme_minimal()
+
+
+
+best_day <- data_days[which.max(data_days$messages),]$weekday
+descdist(messages)
+plot(fitdist(messages, "norm"))
+```
+
+```{r}
+best_hour
+```
+
+```{r}
+hdf <- df[hours(df$date) == best_hour, ]
+messages <- c()
+for (day in days)
+{
+    messages <- c(messages, nrow(hdf[weekdays(hdf$date) == day,])/nrow(hdf))
+}
+
+
+data_bh = data.frame(weekday = days,  messages = messages)
+ggplot(data=data_bh, aes(x=days, y=messages)) +
+       geom_bar(stat="identity", fill="#66a182") +
+       geom_text(aes(label=messages), vjust=-0.3, size=3.5)+
+       scale_x_discrete(limits=days)+
+       theme_minimal()
+
+
+descdist(messages)
+plot(fitdist(messages, "gamma"))
+```
+
+```{r}
+best_day
+```
+
+
+```{r}
+
+
+ddf <- df[weekdays(df$date) == best_day,]
+
+messages <- c()
+for (hour in hours)
+{
+    messages <- c(messages, nrow(ddf[hours(ddf$date) == hour,]))
+}
+
+
+data_bd = data.frame(hours = hours,  messages = messages)
+ggplot(data=data_bd, aes(x=hours, y=messages)) +
+       geom_bar(stat="identity", fill="#66a182") +
+       geom_text(aes(label=messages), vjust=-0.3, size=3.5)+
+       scale_x_discrete(limits=hours)+
+       theme_minimal()
+
+
+descdist(messages)
+plot(fitdist(messages, "gamma"))
+```
+
+
+```{r}
+time_range <- as.numeric(difftime(as.Date(df[1,]$date), as.Date(df[8000,]$date), units = "days")) + 1
+
+
+df[1,]$date
+df[8000,]$date
+
+
+active_days <- length(unique(as.Date(df$date)))
+
+print("Activity %")
+active_days / time_range * 100
 ```
