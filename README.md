@@ -1,10 +1,9 @@
 # Research
----
+
 ## Table of Contents
 * [Into / Motivation ](#intro/motivation)
 * [Data retrieval](#dataretrieval)
 
----
 
 ## Intro / Motivation 😕
 
@@ -34,7 +33,6 @@ So, an interesting question arises, **on what day of the week and at what time s
 
 This is where the Statistics may come in handy.
 
----
 
 ## Data retrieval
 
