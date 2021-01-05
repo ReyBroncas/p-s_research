@@ -1,9 +1,11 @@
 # Research
 
 ## Table of Contents
-* [Into / Motivation ](#intro/motivation)
-* [Data retrieval](#dataretrieval)
-
+* [Intro / Motivation 😕](#intro--motivation-)
+* [Data retrieval](#data-retrieval)
+* [Beginning. How do I export my dialog/chat](#beginning-how-do-i-export-my-dialogchat)
+* [Each message contains fields:](#each-message-contains-fields)
+* [Real world view VS Extracted data view](#real-world-view-vs-extracted-data-view)
 
 ## Intro / Motivation 😕
 
