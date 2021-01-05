@@ -107,7 +107,7 @@ Let's first take an overview of the data we have. So in the end, our dateset con
 
 ### Real world view *VS* Extracted data view
 
-You can view the data here [link](https://www.dropbox.com/s/7rykwc27tq2v1ic/data.csv?dl=0)
+You can view raw data here [link](https://www.dropbox.com/s/7rykwc27tq2v1ic/data.csv?dl=0)
 
 The same message string *`"Сваггер схемы, прото файлы вполне могут быть"`* in Telegram application and in extracted .csv file.
 
