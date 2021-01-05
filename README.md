@@ -111,7 +111,7 @@ You can view the data here [link](https://www.dropbox.com/s/7rykwc27tq2v1ic/data
 
 The same message string *`"Сваггер схемы, прото файлы вполне могут быть"`* in Telegram application and in extracted .csv file.
 
-![Screenshot of Telegram desktop](media/screenshot.png)
+![Screenshot of Telegram desktop](res/screenshot.png)
 
 | id  | date                      | from_id                     | to_id                              | fwd_from                                                                                             | message | type | duration |
 |-----|---------------------------|-----------------------------|------------------------------------|------------------------------------------------------------------------------------------------------|---------|------|----------|
