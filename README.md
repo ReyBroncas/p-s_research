@@ -3,7 +3,7 @@
 ## Table of Contents
 * [Intro / Motivation 😕](#intro--motivation-)
 * [Data retrieval](#data-retrieval)
-* [Beginning. How do I export my dialog/chat](#beginning-how-do-i-export-my-dialogchat)
+* [How do we export our dialog/chat](#how-do-we-export-our-dialogchat)
 * [Each message contains fields:](#each-message-contains-fields)
 * [Real world view VS Extracted data view](#real-world-view-vs-extracted-data-view)
 
@@ -42,7 +42,7 @@ For this mini-research, we will be using our own retrieved data from a relativel
 
 The channel specializes in programming, specifically Python, and is mostly in the Russian language, however because of being the tech chat, there are lots of daily active users, which is what we exactly need.
 
-### Beginning. How do I export my dialog/chat
+### How do we export our dialog/chat
 
 One of the team members has been working on a private project that processes messages in telegram chats/dialogs/channels.
 
