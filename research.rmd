@@ -7,24 +7,47 @@ output:
     df_print: paged
 ---
 
+$$\text{ ## Intro / Motivation 😕 }$$
 
+$\text{Nowadays, advertisement has become an integral part of business as such.}$
+
+$\text{It is no longer a question of whether one needs to promote their business or not. }$
+
+$\text{The question now is how and where to promote one's product. }$
+
+$\text{There is a variety of methods and facilities for advertisement.}$
+
+$\text{According to }$ **Instamber**: *"**telegram marketing can be a productive method to promote your business, as you have millions of active Telegram users around the globe**."* 
+
+$\text{Nevertheless, all the given articles' methods assume those entrepreneurs would either spend lots of time developing their channel or pay money to have their ads spread.}$
+
+$\text{So we come with an alternative approach to promoting a business via Telegram.}$
+
+$\text{Let us assume that we have to promote paid CS courses and materials like books, site subscriptions via Telegram at no cost. In other words, we can pay popular channels for ads and have no time to spare developing any channels.}$
+$\text{So, naturally, we would choose thematic groups for promoting our products. For example, we can take a Python programming group. }$
+
+$\text{It is the right choice because the majority of members of this group are interested in CS. Everything seems to be perfect for our purpose, but there is usually a low level of spam tolerance,}$
+$\text{which ads are considered to be. So we need to embed the advertisement in the message and send them in a way that will not make admins suspect us of spamming or advertising.}$
+
+$\text{The way of embedding an advertisement into a message is neither a matter of probability theory nor statistics. }$
+
+$\text{Let us assume that we come up with an idea of how to do that. Nevertheless, our plan might have drawbacks. For example, admins can be overly suspicious and uncover our scheme if we send too many messages with a hidden advertisement. }$
+$\text{However, that is not a big problem for us, and we can send one message a week, not risking being kicked from the group.}$
+
+$\text{So, an interesting question arises,}$ **on what day of the week and at what time should we send hidden ads to influence as many group members as possible.**
+
+$\text{This is where the Statistics may come in handy.}$
 
 ```{r}
-# Preprocessing
-
+#Here we read our data
 require(chron)
 require(ggplot2)
-require(plyr)
-require(dplyr)
-require(fitdistrplus)
-require(logspline)
 library(chron)
 library(ggplot2)
+library(fitdistrplus)
 library(plyr)
 library(dplyr)
-library(fitdistrplus)
-#library(logspline)
-
+library(logspline)
 
 
 process <- function(date)
@@ -37,161 +60,409 @@ process <- function(date)
 }
 
 
-df <- read.csv("data/data.csv")
-df$date <- process(df$date)
+df_prime <- read.csv("general_df.csv", encoding = "UTF-8")
+df_prime$date <- process(df_prime$date)
 ```
 
+```{r}
+#Some insights of data we are using
+head(df_prime) %>% select(3,4)
+coronda_index = 244000
+df <- df_prime
+```
 
 ```{r}
-# Hours plots
+#Description of the data
+n_msg <- nrow(df)
+last <- as.Date(df[1,]$date)
+first  <- as.Date(df[nrow(df),]$date)
+time_range <- as.numeric(difftime(last, first, units = "days")) + 1
+active_days <-length(unique(as.Date(df$date)))
+avtive <- active_days / time_range * 100
 
-messages <- c()
+
+sprintf("1. Total number of messages:  %d\n", n_msg) %>% cat()
+sprintf("2. Date of the first message: %s\n", toString(first)) %>% cat()
+sprintf("3. Date of the last message:  %s\n", toString(last)) %>% cat()
+sprintf("4. Number of days covered:    %d\n", time_range) %>% cat()
+sprintf("5. Activity percentage:       %d%%\n", avtive) %>% cat()
+```
+
+```{r}
+#Setting of important constants
 hours <- c(0:23)
-
-for (hour in hours){ 
-    messages <- c(messages, nrow(df[hours(df$date) == hour,]))
-}
-
-
-data_am = data.frame(hours = hours[1:12],  messages = messages[1:12])
-data_pm = data.frame(hours = hours[13:24], messages = messages[13:24])
-data_d = data.frame(tm = c(rep("am", 12), rep("pm", 12)), hours = c(hours[1:12], hours[1:12]),  messages = messages)
-data_s = data.frame(hours = hours,  messages = messages)
-
-
-best_hour <- data_s[which.max(data_s$messages),]$hours;
-
-
-ggplot(data=data_am, aes(x=hours, y=messages)) +
-       geom_bar(stat="identity", fill="#5f249f") +
-       geom_text(aes(label=messages), vjust=-0.3, size=3.5)+
-       theme_minimal()
-
-
-
-ggplot(data=data_pm, aes(x=hours, y=messages)) +
-       geom_bar(stat="identity", fill="#5f249f") +
-       geom_text(aes(label=messages), vjust=-0.3, size=3.5)+
-       theme_minimal()
-
-
-
-ggplot(data=data_d, aes(x=hours, y=messages, fill=factor(tm, levels=c("pm", "am")))) +
-       geom_bar(stat="identity") + 
-       scale_fill_brewer(palette="Paired") +
-       theme_minimal()
-
-
-
-ggplot(data=data_s, aes(x=hours, y=messages)) +
-       geom_bar(stat="identity", fill="#5f249f") +
-       geom_text(aes(label=messages), vjust=-0.3, size=3.5)+
-       theme_minimal()
-
-
-descdist(messages)
-plot(fitdist(messages, "unif"))
-
-```
-
-
-
-```{r}
-# Weekday plots
-
-
-
-messages <- c()
 days <- c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")
-
-
-
-for (day in days)
-{
-    messages <- c(messages, nrow(df[weekdays(df$date) == day,]))
-}
-
-
-
-data_days = data.frame(weekday = days,  messages = messages)
-ggplot(data=data_days, aes(x=days, y=messages)) +
-       geom_bar(stat="identity", fill="#66a182") +
-       geom_text(aes(label=messages), vjust=-0.3, size=3.5)+
-       scale_x_discrete(limits=days)+
-       theme_minimal()
-
-
-
-best_day <- data_days[which.max(data_days$messages),]$weekday
-descdist(messages)
-plot(fitdist(messages, "norm"))
 ```
 
+$\text{Firsty, lets find message distribution for hours (from 00:00 to 23:00)}$
 ```{r}
-best_hour
-```
-
-```{r}
-hdf <- df[hours(df$date) == best_hour, ]
+#Finding Message distribution for hours
 messages <- c()
+dt.dst_h <- c()
+
+for (hour in hours)
+{ 
+    num <- length(unique(df[hours(df$date) == hour,]$from_id))
+    dt.dst_h <- c(dt.dst_h, rep(hour, num))
+    messages <- c(messages, num)
+}
+
+dt.hours = data.frame(hours = hours, messages = messages)
+```
+
+```{r}
+#Visulisation
+ggplot(data=dt.hours, aes(x=hours, y=messages, alpha=messages)) +
+       geom_bar(stat="identity", fill="#5f249f") +
+       geom_text(aes(label=messages), vjust=0.3, hjust= 1.1, size=3, color="white", bold=TRUE, alpha=1) +
+       labs(title="Message distribution for hours") +
+       coord_flip()
+```
+
+```{r}
+descdist(dt.dst_h)
+```
+
+$\text{As we can say from the plot, distribution is likely to aproximately normal. And we also can say that most messages}$
+$\text{are concentrated near 12:00 }$
+
+```{r}
+plot(fitdist(dt.dst_h, "norm"))
+```
+
+$\text{Secondly, lets find message distribution for days (from Monday to Sunday)}$
+```{r}
+messages <- c()
+dt.dst_d <- c()
+
 for (day in days)
 {
-    messages <- c(messages, nrow(hdf[weekdays(hdf$date) == day,])/nrow(hdf))
+    num <- length(unique(df[weekdays(df$date) == day,]$from_id))
+    dt.dst_d <- c(dt.dst_d, rep(which(days == day), num))
+    messages <- c(messages, num)
 }
 
 
-data_bh = data.frame(weekday = days,  messages = messages)
-ggplot(data=data_bh, aes(x=days, y=messages)) +
+dt.days = data.frame(weekday = days,  messages = messages)
+```
+
+```{r}
+ggplot(data=dt.days, aes(x=days, y=messages, alpha=messages)) +
        geom_bar(stat="identity", fill="#66a182") +
-       geom_text(aes(label=messages), vjust=-0.3, size=3.5)+
+       labs(title="Message distribution for days") +
+       geom_text(aes(label=messages), vjust=0.4, hjust= 1.1, size=10, color="white", alpha=1) +
        scale_x_discrete(limits=days)+
-       theme_minimal()
+       coord_flip()
+```
+$\text{As we can say from the plot, distribution is likely to aproximately uniformal. And we also can say that most messages}$
+$\text{are concentrated near Thursday}$
 
-
-descdist(messages)
-plot(fitdist(messages, "gamma"))
+```{r}
+descdist(dt.dst_d)
 ```
 
 ```{r}
-best_day
+plot(fitdist(dt.dst_d, "unif", discrete = TRUE))
+```
+
+
+$\text{Now, we have two important distributions, but it is not still enough. As we want to find the best hour for the best day}$
+$\text{It is obvious that we should calculate joint distribution. But befor doing that. Lets calculate conditional distributions for the best day and the best hour alone.}$
+
+```{r}
+best_hour <- dt.hours[which.max(dt.hours$messages),]$hours
+best_day <- dt.days[which.max(dt.days$messages),]$weekday
+bd_lbl <- sprintf("Message distribution for hours of all %s(s)", best_day)
+bh_lbl <- sprintf("Message distribution for days at %d hour", best_hour)
+
+sprintf("1. The most active day:  %s\n", best_day) %>% cat()
+sprintf("2. The most active hour: %d\n", best_hour) %>% cat()
+```
+
+```{r}
+besth_df <- df[hours(df$date) == best_hour, ]
+messages <- c()
+dt.dst_dh <- c()
+
+for (day in days)
+{
+    num <- length(unique(besth_df[weekdays(besth_df$date) == day,]$from_id))
+    dt.dst_dh <- c(dt.dst_dh, rep(which(days == day), num))
+    messages <- c(messages, num)
+}
+
+
+dt.best_hour = data.frame(weekday = days,  messages = messages)
 ```
 
 
 ```{r}
+ggplot(data=dt.best_hour, aes(x=days, y=messages, alpha=messages)) +
+       geom_bar(stat="identity", fill="#66a182") +
+       labs(title=bh_lbl) +
+       geom_text(aes(label=messages), vjust=0.4, hjust= 1.1, size=10, color="white", alpha=1) +
+       scale_x_discrete(limits=days)+
+       coord_flip()
+```
+$\text{As we can say from the plot, some chances are that distribution is aproximately uniformal. Interesting thing is that}$
+$\text{the best day to choose for sending hiden advertisment at calculated best hour is different from calculated best day :)}$
 
+```{r}
+descdist(dt.dst_dh)
+```
 
-ddf <- df[weekdays(df$date) == best_day,]
+```{r}
+plot(fitdist(dt.dst_dh, "unif", discrete = TRUE))
+```
+
+```{r}
+bestd_df <- df[weekdays(df$date) == best_day,]
+dt.dst_hd <- c()
 
 messages <- c()
 for (hour in hours)
 {
-    messages <- c(messages, nrow(ddf[hours(ddf$date) == hour,]))
+    num <- length(unique(bestd_df[hours(bestd_df$date) == hour,]$from_id))
+    dt.dst_hd <- c(dt.dst_hd, rep(hour, num))
+    messages <- c(messages, num)
 }
 
 
-data_bd = data.frame(hours = hours,  messages = messages)
-ggplot(data=data_bd, aes(x=hours, y=messages)) +
+df.best_day = data.frame(hours = hours,  messages = messages)
+```
+
+```{r}
+ggplot(data=df.best_day, aes(x=hours, y=messages, alpha=messages)) +
+       geom_bar(stat="identity", fill="#5f249f") +
+       labs(title=bd_lbl) +
+       geom_text(aes(label=messages), vjust=0.3, hjust= 1.1, size=3, color="white", bold=TRUE, alpha=1) +
+       coord_flip()
+```
+$\text{As we can say from the plot that distribution is aproximately normal. Interesting thing is that}$
+$\text{the best hour to choose for sending hiden advertisment on calculated best day is different also from calculated best hour :)}$
+
+```{r}
+descdist(dt.dst_hd)
+```
+
+```{r}
+plot(fitdist(dt.dst_hd, "norm"))
+```
+
+$\text{Now, lest find joint distribution and find out, which of the condition distributions has given the correct result}$
+
+```{r}
+counter = 1
+dt.dst_joint <- c()
+messages <- c()
+
+for (hour in hours)
+{ 
+    hdf <- df[hours(df$date) == hour,]
+    for (day in days)
+    {
+      num <- length(unique(hdf[weekdays(hdf$date) == day,]$from_id))
+      dt.dst_joint <- c(dt.dst_joint, rep(counter, num))
+      messages <- c(messages, num)
+      counter <- counter + 1
+    }
+}
+
+dt.joint = data.frame(HnD = seq(1:(counter-1)),  messages = messages)
+```
+
+```{r}
+ggplot(data=dt.joint, aes(x=HnD, y=messages, alpha=messages)) +
+       geom_bar(stat="identity", fill="#5f249f") +
+       labs("Joint Message distribution for days and hours") +
+       coord_flip()
+```
+$\text{WOW, we can see that condtional distribution of messages given hour produces the same result !)}$
+
+```{r}
+descdist(dt.dst_joint)
+```
+
+```{r}
+plot(fitdist(dt.dst_joint, "norm"))
+```
+
+
+$\text{It is also interesting to find the distribution of message for all best days&hours for the whole period}$
+```{r}
+best_HnD <- dt.joint[which.max(df.joint$messages),]$HnD
+true_best_hour <- best_HnD %/% 7
+true_best_day  <- days[best_HnD - 7*true_best_hour]
+
+last <- df[weekdays(df$date) == true_best_day & hours(df$date) == hour,]
+last$date <- as.Date(last$date)
+u_dates <- unique(last$date)
+```
+
+```{r}
+counter = 1
+dt.dst_best <- c()
+messages <- c()
+
+
+for (date in u_dates)
+{
+    num <- nrow(last[last$date == date, ])
+    messages <- c(messages, num)
+    dt.dst_best <- c(dt.dst_best, rep(counter, num))
+    counter <- counter + 1
+}
+
+
+dt.best_dist = data.frame(dates = seq(1:(counter-1)),  messages = messages)
+```
+
+```{r}
+ggplot(data=dt.best_dist, aes(x=dates, y=messages, alpha=messages)) +
        geom_bar(stat="identity", fill="#66a182") +
-       geom_text(aes(label=messages), vjust=-0.3, size=3.5)+
-       scale_x_discrete(limits=hours)+
-       theme_minimal()
+       labs(title=sprintf("All %s(s) %d:00 message distribution from 2018 till now", true_best_day, true_best_hour)) +
+       coord_flip()
+```
+
+```{r}
+descdist(dt.dst_best)
+```
+
+```{r}
+plot(fitdist(dt.dst_best, "unif"))
+```
 
 
-descdist(messages)
-plot(fitdist(messages, "gamma"))
+$\text{Hm, we can say that it tends to be uniformal. Nevertheless, it is scattered a lot}$
+
+$\text{Now, we come to the interesting question. What is the reason for that high variance?}$
+$\text{We think it is because of the COVID. So, our hypothesis would be}$
+$H_0:$$\text{It is not because of COVID}$
+$H_1:$$\text{It is because of COVID}$
+
+$\text{To check that we would find distribution of two periods befor covid and after. The using f-test we would compare their variances.}$
+$\text{If variance of the COVID period is differt from pevious period we would say that NULL hypothesis is rejected}$
+
+```{r}
+df_covid = df[1: coronda_index,]
+counter = 1
+dt.dst_joint_corona <- c()
+messages <- c()
+
+for (hour in hours)
+{ 
+    hdf <- df_covid[hours(df_covid$date) == hour,]
+    for (day in days)
+    {
+      num <- length(unique(hdf[weekdays(hdf$date) == day,]$from_id))
+      dt.dst_joint_corona <- c(dt.dst_joint_corona, rep(counter, num))
+      messages <- c(messages, num)
+      counter <- counter + 1
+    }
+}
+
+dt.joint_corona = data.frame(HnD = seq(1:(counter-1)),  messages = messages)
+```
+
+```{r}
+best_HnD_covid <- dt.joint_corona[which.max(dt.joint_corona$messages),]$HnD
+true_best_hour_covid <- best_HnD_covid %/% 7
+true_best_day_covid  <- days[best_HnD_covid - 7*true_best_hour_covid]
+
+last_covid <- df_covid[weekdays(df_covid$date) == true_best_day_covid & hours(df_covid$date) == true_best_hour_covid,]
+last_covid$date <- as.Date(last_covid$date)
+u_dates_covid <- unique(last_covid$date)
+```
+
+```{r}
+counter = 1
+dt.dst_best_covid <- c()
+messages <- c()
+
+
+for (date in u_dates_covid)
+{
+    num <- nrow(last_covid[last_covid$date == date, ])
+    messages <- c(messages, num)
+    dt.dst_best_covid <- c(dt.dst_best_covid, rep(counter, num))
+    counter <- counter + 1
+}
+
+
+df.best_dist_covid = data.frame(dates = seq(1:(counter-1)),  messages = messages)
+```
+
+```{r}
+df_pre_covid = df[coronda_index: nrow(df),]
+counter = 1
+dt.dst_joint_pre_corona <- c()
+messages <- c()
+
+for (hour in hours)
+{ 
+    hdf <- df_pre_covid[hours(df_pre_covid$date) == hour,]
+    for (day in days)
+    {
+      num <- length(unique(hdf[weekdays(hdf$date) == day,]$from_id))
+      dt.dst_joint_pre_corona <- c(dt.dst_joint_pre_corona, rep(counter, num))
+      messages <- c(messages, num)
+      counter <- counter + 1
+    }
+}
+
+dt.joint_pre_corona = data.frame(HnD = seq(1:(counter-1)),  messages = messages)
+```
+
+```{r}
+best_HnD_pre_covid <- dt.joint_pre_corona[which.max(dt.joint_pre_corona$messages),]$HnD
+true_best_hour_pre_covid <- best_HnD_pre_covid %/% 7
+true_best_day_pre_covid  <- days[best_HnD_pre_covid - 7*true_best_hour_pre_covid]
+
+last_pre_covid <- df_pre_covid[weekdays(df_pre_covid$date) == true_best_day_pre_covid & hours(df_pre_covid$date) == true_best_hour_pre_covid,]
+last_pre_covid$date <- as.Date(last_pre_covid$date)
+u_dates_pre_covid <- unique(last_pre_covid$date)
+```
+
+```{r}
+counter = 1
+dt.dst_best_pre_covid <- c()
+messages <- c()
+
+
+for (date in u_dates_pre_covid)
+{
+    num <- nrow(last_pre_covid[last_pre_covid$date == date, ])
+    messages <- c(messages, num)
+    dt.dst_best_pre_covid <- c(dt.dst_best_pre_covid, rep(counter, num))
+    counter <- counter + 1
+}
+
+
+df.best_dist_pre_covid = data.frame(dates = seq(1:(counter-1)),  messages = messages)
+```
+
+```{r}
+var.test(dt.dst_best_pre_covid, dt.dst_best_covid, alternative = "l")
+```
+
+```{r}
+ggplot(data=df.best_dist_pre_covid, aes(x=dates, y=messages, alpha=messages)) +
+       geom_bar(stat="identity", fill="#66a182") +
+       labs(title=sprintf("All %s(s) %d:00 message distribution from 2018 till covid", true_best_day_pre_covid, true_best_hour_pre_covid)) +
+       coord_flip()
 ```
 
 
 ```{r}
-time_range <- as.numeric(difftime(as.Date(df[1,]$date), as.Date(df[8000,]$date), units = "days")) + 1
-
-
-df[1,]$date
-df[8000,]$date
-
-
-active_days <- length(unique(as.Date(df$date)))
-
-print("Activity %")
-active_days / time_range * 100
+ggplot(data=df.best_dist_covid, aes(x=dates, y=messages, alpha=messages)) +
+       geom_bar(stat="identity", fill="#66a182") +
+       labs(title=sprintf("All %s(s) %d:00 message distribution from covid till now", true_best_day_covid, true_best_hour_covid)) +
+       coord_flip()
 ```
+
+
+Great! NULL hypothesis is rejected!
+So as we can see, during the COVID period programmers tends to spend most of their group activity on Sunday at 12:00. It may be caused by the complication of working at home. So they spend even weekend finding solutions or asking for help in this Python group.
+
+
+
