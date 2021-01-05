@@ -6,7 +6,7 @@
 * [How do we export our dialog/chat](#how-do-we-export-our-dialogchat)
 * [Each message contains fields:](#each-message-contains-fields)
 * [Real world view VS Extracted data view](#real-world-view-vs-extracted-data-view)
-
+* [Authors](#authors)
 ## Intro / Motivation 😕
 
 Nowadays, advertisement has become an integral part of business as such.
